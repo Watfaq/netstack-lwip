@@ -104,6 +104,15 @@ impl UdpSocket {
     pub fn split(self: Box<Self>) -> (SendHalf, RecvHalf) {
         (SendHalf { pcb: self.pcb }, RecvHalf { socket: self })
     }
+
+    pub fn local_addr(&self) -> SocketAddr {
+        unsafe {
+            let pcb = self.pcb as *mut udp_pcb;
+            let ip = (*pcb).local_ip;
+            let port = (*pcb).local_port;
+            util::to_socket_addr(&ip, port)
+        }
+    }
 }
 
 impl Drop for UdpSocket {
