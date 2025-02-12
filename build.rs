@@ -20,10 +20,10 @@ fn sdk_include_path_for(sdk: &str) -> String {
 
 fn sdk_include_path() -> Option<String> {
     let os = env::var("CARGO_CFG_TARGET_OS").unwrap();
-    let arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
+    let target = env::var("TARGET").unwrap();
     match os.as_str() {
         "ios" => {
-            if arch == "x86_64" {
+            if target == "x86_64-apple-ios" || target == "aarch64-apple-ios-sim" {
                 Some(sdk_include_path_for("iphonesimulator"))
             } else {
                 Some(sdk_include_path_for("iphoneos"))
@@ -118,15 +118,8 @@ fn generate_lwip_bindings() {
 }
 
 fn main() {
-    let os = env::var("CARGO_CFG_TARGET_OS").unwrap();
-    if os == "ios" || os == "android" || os == "linux" || os == "macos" || os == "windows" {
-        compile_lwip();
-    }
-
-    if env::var("BINDINGS_GEN").is_ok()
-        && (os == "ios" || os == "android" || os == "linux" || os == "macos")
-        || os == "windows"
-    {
+    if env::var("BINDINGS_GEN").is_ok() {
         generate_lwip_bindings();
     }
+    compile_lwip();
 }
