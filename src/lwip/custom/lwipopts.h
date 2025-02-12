@@ -40,7 +40,7 @@
 #define LWIP_ARP 0
 #define ARP_QUEUEING 0
 #define IP_FORWARD 0
-#define LWIP_ICMP 1
+#define LWIP_ICMP 0
 #define LWIP_RAW 1
 #define LWIP_DHCP 0
 #define LWIP_AUTOIP 0
@@ -128,7 +128,6 @@
 // is used regardless of the platform
 #define IPV6_FRAG_COPYHEADER 1
 
-#define LWIP_DEBUG 0
 #define LWIP_DBG_MIN_LEVEL LWIP_DBG_LEVEL_ALL
 #define LWIP_DBG_TYPES_ON LWIP_DBG_OFF
 #define NETIF_DEBUG LWIP_DBG_OFF

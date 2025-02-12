@@ -20,10 +20,10 @@ fn sdk_include_path_for(sdk: &str) -> String {
 
 fn sdk_include_path() -> Option<String> {
     let os = env::var("CARGO_CFG_TARGET_OS").unwrap();
-    let arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
+    let target = env::var("TARGET").unwrap();
     match os.as_str() {
         "ios" => {
-            if arch == "x86_64" {
+            if target == "x86_64-apple-ios" || target == "aarch64-apple-ios-sim" {
                 Some(sdk_include_path_for("iphonesimulator"))
             } else {
                 Some(sdk_include_path_for("iphoneos"))
@@ -94,12 +94,13 @@ fn generate_lwip_bindings() {
     let arch = env::var("CARGO_CFG_TARGET_ARCH").unwrap();
     let os = env::var("CARGO_CFG_TARGET_OS").unwrap();
     let mut builder = bindgen::Builder::default()
+        .size_t_is_usize(false)
         .header("src/wrapper.h")
         .clang_arg("-I./src/lwip/include")
         .clang_arg("-I./src/lwip/custom")
         .clang_arg("-Wno-everything")
         .layout_tests(false)
-        .parse_callbacks(Box::new(bindgen::CargoCallbacks));
+        .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()));
     if arch == "aarch64" && os == "ios" {
         // https://github.com/rust-lang/rust-bindgen/issues/1211
         builder = builder.clang_arg("--target=arm64-apple-ios");
@@ -117,14 +118,8 @@ fn generate_lwip_bindings() {
 }
 
 fn main() {
-    let os = env::var("CARGO_CFG_TARGET_OS").unwrap();
-    if os == "ios" || os == "android" || os == "linux" || os == "macos" {
-        compile_lwip();
-    }
-
-    if env::var("BINDINGS_GEN").is_ok()
-        && (os == "ios" || os == "android" || os == "linux" || os == "macos")
-    {
+    if env::var("BINDINGS_GEN").is_ok() {
         generate_lwip_bindings();
     }
+    compile_lwip();
 }
